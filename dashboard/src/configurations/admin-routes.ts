@@ -1,9 +1,8 @@
 import AdminHome from "modules/admin-home-page";
 import LoginPage from "modules/users/components/loginPage";
-import UserProfile from "modules/users/components/userProfile";
 import UsersListPage from "modules/users/components/usersListPage";
-import AnnouncementsListPage from "modules/announcements/components/page";
 import CommitteesListPage from "modules/committees/components/committeesListPage";
+import BestMembersListPage from "modules/best-members/components/page";
 
 import { RouteStructure } from "configurations/interfaces/route.interface";
 
@@ -12,6 +11,7 @@ export let adminRoutes: RouteStructure[] = [
     path: "/",
     label: "Home",
     component: AdminHome,
+    adminOnly: true
   },
   {
     path: "/login",
@@ -21,10 +21,7 @@ export let adminRoutes: RouteStructure[] = [
     path: "/users",
     label: "Users",
     component: UsersListPage,
-  },
-  {
-    path: "/users/:id",
-    component: UserProfile,
+    adminOnly: true
   },
   {
     path: "/committees",
@@ -33,9 +30,9 @@ export let adminRoutes: RouteStructure[] = [
     adminOnly: true
   },
   {
-    path: "/announcements",
-    label: "Announcements",
-    component: AnnouncementsListPage,
+    path: "/best-members",
+    label: "Best Members",
+    component: BestMembersListPage,
     adminOnly: true
   },
 ];

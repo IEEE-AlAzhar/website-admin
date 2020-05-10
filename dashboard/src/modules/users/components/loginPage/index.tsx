@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import UserService from "modules/users/services/user.service";
+import FormInput from "shared/Input";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 
@@ -8,7 +9,8 @@ import "./style.css";
 
 interface State {
   user: {
-    code: string;
+    username: string;
+    password: string;
   };
   isLoading: boolean;
   success: string;
@@ -24,7 +26,8 @@ interface Prop {
 export default class LoginPage extends Component<Prop, State> {
   state = {
     user: {
-      code: "",
+      username: "",
+      password: "",
     },
     isLoading: false,
     success: "",
@@ -79,14 +82,14 @@ export default class LoginPage extends Component<Prop, State> {
         setTimeout(() => {
           window.location.href = "/";
         }, 2000);
-      } else if (type === "Board") {
+      } else if (type === "Marketer") {
         this.setState({
           isLoading: false,
           success: "Logged in successfully",
           error: "",
         });
         setTimeout(() => {
-          window.location.href = "/users";
+          window.location.href = "/blog";
         }, 2000);
       }
     } catch (err) {
@@ -99,20 +102,37 @@ export default class LoginPage extends Component<Prop, State> {
   };
 
   render() {
-    let { isLoading, success, error } = this.state;
+    let { isLoading, success, error, user } = this.state;
     return (
       <section className="login-page">
         <div className="login-form-box">
           <h1 className="text-center h3 mb-5"> Login to the dashboard </h1>
           <form className="login-form" onSubmit={this.handleSubmit}>
             <div className="form-group">
-              <label>Code</label>
-              <input
+              <FormInput
                 type="text"
-                className="form-control"
-                name="code"
+                required={true}
+                placeholder="Username"
+                label="Username"
+                id="username"
+                name="username"
+                errorPosition="bottom"
+                value={user.username}
                 onChange={this.handleChange}
-                placeholder="Enter your code .."
+              />
+            </div>
+
+            <div className="form-group">
+              <FormInput
+                type="password"
+                className="form-control"
+                required={true}
+                label="Password"
+                id="password"
+                name="password"
+                errorPosition="bottom"
+                value={user.password}
+                onChange={this.handleChange}
               />
             </div>
             <button type="submit" className="btn btn-primary btn-block">

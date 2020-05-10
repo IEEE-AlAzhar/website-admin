@@ -9,7 +9,7 @@ export default class UserService extends CrudService {
     this.logout = this.logout.bind(this);
   }
 
-  async login(cred: { code: string }) {
+  async login(cred: { username: string; password: string }) {
     let response = await this._http.post(`${this.url}/login`, cred);
 
     localStorage.setItem("user", JSON.stringify(response.data.user));

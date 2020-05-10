@@ -3,12 +3,12 @@ import React, { Component } from "react";
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
 
-import { User } from "configurations/interfaces/user.interface";
+import { BestMember } from "configurations/interfaces/best-member.interface";
 import { Committee } from "configurations/interfaces/committee.interface";
 import CommitteeService from "modules/committees/services/committee.service";
-
 import Loading from "shared/loading";
 import FormInput from "shared/Input";
+import ImageInput from "shared/image-input";
 
 interface Prop {
   isModalOpened: boolean;
@@ -19,18 +19,17 @@ interface Prop {
 }
 
 interface State {
-  user: User;
+  bestMember: BestMember;
   isLoading: boolean;
   isImageUploading: boolean;
   committees: string[];
 }
 
-export default class UserForm extends Component<Prop, State> {
+export default class BestMemberForm extends Component<Prop, State> {
   state = {
-    user: {
-      username: "",
-      password: "",
-      type: "",
+    bestMember: {
+      name: "",
+      image: "",
       committee: "",
     },
     committees: [] as string[],
@@ -50,7 +49,7 @@ export default class UserForm extends Component<Prop, State> {
 
     if (itemToBeEdited) {
       itemToBeEdited.date = this.formatDate();
-      this.setState({ user: itemToBeEdited });
+      this.setState({ bestMember: itemToBeEdited });
     }
 
     this._committeeService.list().then((response) => {
@@ -60,11 +59,18 @@ export default class UserForm extends Component<Prop, State> {
     });
   }
 
+  generateArrayOfCommitteesNames = (committeesArray: Committee[]): string[] => {
+    let committeesNames: string[] = [];
+    committeesArray.map(({ name }) => committeesNames.push(name));
+
+    return committeesNames;
+  };
+
   setImageUpload = (status: boolean, imageUrl?: string) => {
     this.setState({ isImageUploading: status });
     if (imageUrl)
       this.setState({
-        user: { ...this.state.user, image: imageUrl } as any,
+        bestMember: { ...this.state.bestMember, image: imageUrl } as any,
       });
   };
 
@@ -84,8 +90,8 @@ export default class UserForm extends Component<Prop, State> {
     let { name, value } = e.currentTarget;
 
     this.setState({
-      user: {
-        ...this.state.user,
+      bestMember: {
+        ...this.state.bestMember,
         [name]: value,
       } as any,
     });
@@ -94,18 +100,19 @@ export default class UserForm extends Component<Prop, State> {
   handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    let { user } = this.state;
+    let { bestMember } = this.state;
 
     this.setState(
       {
-        user: {
-          ...user,
+        bestMember: {
+          ...bestMember,
+          date: this.formatDate(),
         } as any,
       },
       () => {
-        this.props.onSubmit(this.state.user, true).then(() => {
-          this.resetObj(user);
-          this.setState({ user: user });
+        this.props.onSubmit(bestMember, true).then(() => {
+          this.resetObj(bestMember);
+          this.setState({ bestMember: bestMember });
         });
       }
     );
@@ -117,24 +124,6 @@ export default class UserForm extends Component<Prop, State> {
     }
   }
 
-  generateCode = (): void => {
-    let randomNumber = Math.floor(100000000 + Math.random() * 900000000);
-
-    this.setState({
-      user: {
-        ...this.state.user,
-        code: String(randomNumber),
-      } as any,
-    });
-  };
-
-  generateArrayOfCommitteesNames = (committeesArray: Committee[]): string[] => {
-    let committeesNames: string[] = [];
-    committeesArray.map(({ name }) => committeesNames.push(name));
-
-    return committeesNames;
-  };
-
   render() {
     let {
       isModalOpened,
@@ -142,7 +131,7 @@ export default class UserForm extends Component<Prop, State> {
       closeModal,
       isSubmitting,
     } = this.props;
-    let { user, isLoading, isImageUploading, committees } = this.state;
+    let { bestMember, isLoading, isImageUploading, committees } = this.state;
 
     return (
       <Modal
@@ -161,40 +150,23 @@ export default class UserForm extends Component<Prop, State> {
           <Loading />
         ) : (
           <>
-            <h3 className="mb-3"> Member </h3>
+            <h3 className="mb-3"> Best Members </h3>
             <form onSubmit={this.handleSubmit}>
               <div className="row">
-                <div className="form-group col-md-6">
+                <div className="form-group col-md-12">
                   <FormInput
                     type="text"
                     required={true}
-                    placeholder="Username"
-                    label="Name"
+                    placeholder="Name of the member"
+                    label="Member name"
                     id="name"
                     name="name"
                     errorPosition="bottom"
-                    value={user.username}
+                    value={bestMember.name}
                     onChange={this.handleChange}
                   />
                 </div>
-                <div className="form-group col-md-6">
-                  <FormInput
-                    type="select"
-                    className="form-control"
-                    options={["Admin", "Marketer"]}
-                    required={true}
-                    label="Type"
-                    id="type"
-                    name="type"
-                    errorPosition="bottom"
-                    value={user.type}
-                    onChange={this.handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="form-group col-md-6">
+                <div className="form-group col-md-12">
                   <FormInput
                     type="select"
                     className="form-control"
@@ -206,25 +178,17 @@ export default class UserForm extends Component<Prop, State> {
                     id="committee"
                     name="committee"
                     errorPosition="bottom"
-                    value={user.committee}
-                    onChange={this.handleChange}
-                  />
-                </div>
-
-                <div className="form-group col-md-6">
-                  <FormInput
-                    type="password"
-                    className="form-control"
-                    required={true}
-                    label="Password"
-                    id="password"
-                    name="password"
-                    errorPosition="bottom"
-                    value={user.password}
+                    value={bestMember.committee}
                     onChange={this.handleChange}
                   />
                 </div>
               </div>
+
+              <ImageInput
+                imgUrl={bestMember.image}
+                name="image"
+                setImageUpload={this.setImageUpload}
+              />
 
               <button
                 type="submit"

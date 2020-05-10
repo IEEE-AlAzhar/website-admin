@@ -21,14 +21,17 @@ mongoose
 app.use(express.json());
 app.use(cors());
 
-const userController = require("./controllers/users.controller");
-app.use("/api/users", userController);
-
 const announcementController = require("./controllers/announcements.controller.js");
 app.use("/api/announcements", announcementController);
 
+const bestMemberController = require("./controllers/best-members.controller");
+app.use("/api/best-members", bestMemberController);
+
 const committeeController = require("./controllers/committees.controller");
 app.use("/api/committees", committeeController);
+
+const userController = require("./controllers/users.controller");
+app.use("/api/users", userController);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "public")));

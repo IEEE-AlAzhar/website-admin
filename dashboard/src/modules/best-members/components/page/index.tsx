@@ -3,10 +3,11 @@ import React, { Component } from "react";
 import AdminLayout from "shared/admin-layout";
 import AdminTable from "shared/admin-table";
 import Loading from "shared/loading";
-import UserForm from "../userForm";
+import BestMemberForm from "../form";
 
 import UserService from "modules/users/services/user.service";
-import { User } from "configurations/interfaces/user.interface";
+import BestMembersService from "modules/best-members/services/best-member.service";
+import { BestMember } from "configurations/interfaces/best-member.interface";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,8 +20,8 @@ interface Prop {
 }
 
 interface State {
-  users: User[];
-  userToBeEdited?: User | null;
+  bestMembers: BestMember[];
+  bestMemberToBeEdited?: BestMember | null;
   successAlert: string;
   errorAlert: string;
   isLoading: boolean;
@@ -29,63 +30,61 @@ interface State {
   idOfItemToBeDeleted: string;
 }
 
-export default class UsersListPage extends Component<Prop, State> {
+export default class BestMembersListPage extends Component<Prop, State> {
   tableConfig = {
-    tableHeaders: [
-      "username",
-      "type",
-      "committee",
-    ],
+    tableHeaders: ["name", "committee"],
     className: "table-striped",
     actions: ["edit", "delete"],
   };
 
   state = {
-    users: [] as User[],
+    bestMembers: [] as BestMember[],
     successAlert: "",
     errorAlert: "",
-    userToBeEdited: {} as User,
+    bestMemberToBeEdited: {} as BestMember,
     isLoading: false,
     isCreateModalOpened: false,
     isSubmitting: false,
     idOfItemToBeDeleted: "",
   };
 
+  public _bestMembersService: BestMembersService;
   public _userService: UserService;
+
   constructor(props: Prop) {
     super(props);
+    this._bestMembersService = new BestMembersService();
     this._userService = new UserService();
   }
 
   async componentDidMount() {
     if (!this._userService.isUserLoggedIn())
       return this.props.history.push("/login");
-
     this.setState({ isLoading: true });
     try {
-      let users = await this._userService.list();
+      let bestMembers = await this._bestMembersService.list();
 
-      this.setState({ users, isLoading: false });
+      this.setState({ bestMembers, isLoading: false });
     } catch {
       this.setState({ errorAlert: "Error retrieving items", isLoading: false });
     }
   }
 
-  createUser = (user: User) => {
-    let { users } = this.state;
+  createBestMember = (bestMember: BestMember) => {
+    let { bestMembers } = this.state;
 
     this.setState({
       isSubmitting: true,
     });
 
-    return this._userService
-      .create(user)
+    return this._bestMembersService
+      .create(bestMember)
       .then((response) => {
-        users.unshift(response as never);
+        bestMembers.unshift(response as never);
 
         this.setState({
-          users,
-          successAlert: "User added successfully",
+          bestMembers,
+          successAlert: "Member added successfully",
           errorAlert: "",
           isCreateModalOpened: false,
           isSubmitting: false,
@@ -93,31 +92,31 @@ export default class UsersListPage extends Component<Prop, State> {
       })
       .catch((err) => {
         this.setState({
-          errorAlert: err.response.data.msg,
+          errorAlert: "An error occurred",
           successAlert: "",
           isSubmitting: false,
         });
       });
   };
 
-  editUser = (
-    user: User,
+  editBestMember = (
+    bestMember: BestMember,
     submit: boolean,
-    id = this.state.userToBeEdited._id
+    id = this.state.bestMemberToBeEdited._id
   ) => {
     if (submit) {
       this.setState({
         isSubmitting: true,
       });
-      return this._userService
-        .update(id, user)
+      return this._bestMembersService
+        .update(id, bestMember)
         .then((response) => {
-          this.updateStateWithNewUser(response);
+          this.updateStateWithNewBestMember(response);
           this.setState({
             isSubmitting: false,
-            successAlert: "User updated successfully",
+            successAlert: "Member updated successfully",
             errorAlert: "",
-            userToBeEdited: {} as User,
+            bestMemberToBeEdited: {} as BestMember,
           });
         })
         .catch((err) => {
@@ -128,29 +127,31 @@ export default class UsersListPage extends Component<Prop, State> {
     } else {
       this.setState({
         isSubmitting: false,
-        userToBeEdited: user,
+        bestMemberToBeEdited: bestMember,
       });
     }
   };
 
-  updateStateWithNewUser = (user: User) => {
-    let { users } = this.state;
-    let objectToUpdateIndex: number = users.findIndex(
-      (item: User) => item._id === user._id
+  updateStateWithNewBestMember = (bestMember: BestMember) => {
+    let { bestMembers } = this.state;
+    let objectToUpdateIndex: number = bestMembers.findIndex(
+      (item: BestMember) => item._id === bestMember._id
     );
 
-    users.splice(objectToUpdateIndex, 1, user as never);
+    bestMembers.splice(objectToUpdateIndex, 1, bestMember as never);
 
-    this.setState({ users });
+    this.setState({ bestMembers });
   };
 
-  removeUser = (id: string, submit?: boolean) => {
-    let { users } = this.state;
+  removeBestMember = (id: string, submit?: boolean) => {
+    let { bestMembers } = this.state;
 
     if (submit) {
-      this._userService.delete(id).then(() => {
+      this._bestMembersService.delete(id).then(() => {
         this.setState({
-          users: users.filter((item: User) => item._id !== id),
+          bestMembers: bestMembers.filter(
+            (item: BestMember) => item._id !== id
+          ),
         });
       });
     } else {
@@ -162,10 +163,10 @@ export default class UsersListPage extends Component<Prop, State> {
 
   render() {
     let {
-      users,
+      bestMembers,
       successAlert,
       errorAlert,
-      userToBeEdited,
+      bestMemberToBeEdited,
       idOfItemToBeDeleted,
       isLoading,
       isCreateModalOpened,
@@ -175,47 +176,49 @@ export default class UsersListPage extends Component<Prop, State> {
     return (
       <AdminLayout>
         <header className="d-flex justify-content-between container mt-5">
-          <h2> Users </h2>
+          <h2> Best Members </h2>
           <button
             className="btn btn-success"
             onClick={() => this.setState({ isCreateModalOpened: true })}
           >
-            <FontAwesomeIcon icon={faPlus} /> Create New User
+            <FontAwesomeIcon icon={faPlus} /> Create New Member
           </button>
         </header>
         {isLoading ? (
           <div className="text-center mt-5">
             <Loading />
           </div>
-        ) : users.length > 0 ? (
+        ) : bestMembers.length > 0 ? (
           <div className="container mt-5">
             <AdminTable
               config={this.tableConfig}
-              triggerEditEvent={this.editUser}
-              deleteRow={this.removeUser}
-              tableBody={users as any}
+              triggerEditEvent={this.editBestMember}
+              deleteRow={this.removeBestMember}
+              tableBody={bestMembers as any}
             />
           </div>
         ) : (
           <div className="text-center my-5">
-            <p>No users yet</p>
+            <p>No Members yet</p>
           </div>
         )}
 
-        {Object.keys(userToBeEdited).length > 1 && (
-          <UserForm
-            isModalOpened={Object.keys(userToBeEdited).length > 1}
-            itemToBeEdited={userToBeEdited}
-            onSubmit={this.editUser}
+        {Object.keys(bestMemberToBeEdited).length > 1 && (
+          <BestMemberForm
+            isModalOpened={Object.keys(bestMemberToBeEdited).length > 1}
+            itemToBeEdited={bestMemberToBeEdited}
+            onSubmit={this.editBestMember}
             isSubmitting={isSubmitting}
-            closeModal={() => this.setState({ userToBeEdited: {} as User })}
+            closeModal={() =>
+              this.setState({ bestMemberToBeEdited: {} as BestMember })
+            }
           />
         )}
 
-        <UserForm
+        <BestMemberForm
           isModalOpened={isCreateModalOpened}
           isSubmitting={isSubmitting}
-          onSubmit={this.createUser}
+          onSubmit={this.createBestMember}
           closeModal={() => this.setState({ isCreateModalOpened: false })}
         />
 
@@ -244,7 +247,7 @@ export default class UsersListPage extends Component<Prop, State> {
           confirmBtnBsStyle="danger"
           title="Are you sure?"
           onConfirm={() => {
-            this.removeUser(idOfItemToBeDeleted, true);
+            this.removeBestMember(idOfItemToBeDeleted, true);
             this.setState({ idOfItemToBeDeleted: "" });
           }}
           onCancel={() => this.setState({ idOfItemToBeDeleted: "" })}
