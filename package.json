@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/IEEE-AlAzhar/Mobile-App-Back#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.1.0",
     "concurrently": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

@@ -30,6 +30,9 @@ app.use("/api/best-members", bestMemberController);
 const committeeController = require("./controllers/committees.controller");
 app.use("/api/committees", committeeController);
 
+const subscriberController = require("./controllers/subscribe.controller");
+app.use("/api/subscribers", subscriberController);
+
 const messageController = require("./controllers/messages.controller");
 app.use("/api/messages", messageController);
 
