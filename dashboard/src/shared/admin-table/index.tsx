@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faEdit, faEye } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
 import "./style.css";
@@ -15,6 +15,7 @@ interface Prop {
   };
   tableBody: any[];
   triggerEditEvent?: (item: any, submit: boolean, id?: string) => void;
+  triggerViewEvent?: (item: any) => void;
   deleteRow: (id: string, isToBeSubmitted: boolean) => void;
 }
 
@@ -61,6 +62,7 @@ export default class AdminTable extends Component<Prop> {
           }
         })}
         <td>
+          {config.actions.includes("view") && this.renderViewBtn(item)}
           {config.actions.includes("edit") && this.renderEditBtn(item)}
           {config.actions.includes("delete") && this.renderDeleteBtn(item)}
         </td>
@@ -80,6 +82,22 @@ export default class AdminTable extends Component<Prop> {
         onClick={() => triggerEditEvent(item, false, item._id)}
       >
         <FontAwesomeIcon icon={faEdit} />
+      </button>
+    );
+  };
+
+  renderViewBtn = (item: any) => {
+    let { triggerViewEvent } = this.props;
+
+    return (
+      <button
+        className="btn btn-secondary mr-2"
+        data-toggle="modal"
+        data-target="#viewModal"
+        title="View Item"
+        onClick={() => triggerViewEvent(item)}
+      >
+        <FontAwesomeIcon icon={faEye} />
       </button>
     );
   };

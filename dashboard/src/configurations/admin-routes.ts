@@ -3,6 +3,7 @@ import LoginPage from "modules/users/components/loginPage";
 import UsersListPage from "modules/users/components/usersListPage";
 import CommitteesListPage from "modules/committees/components/committeesListPage";
 import BestMembersListPage from "modules/best-members/components/page";
+import MessagesListPage from "modules/messages/components/messagesListPage";
 
 import { RouteStructure } from "configurations/interfaces/route.interface";
 
@@ -33,6 +34,12 @@ export let adminRoutes: RouteStructure[] = [
     path: "/best-members",
     label: "Best Members",
     component: BestMembersListPage,
+    adminOnly: true
+  },
+  {
+    path: "/messages",
+    label: "Inbox",
+    component: MessagesListPage,
     adminOnly: true
   },
 ];
