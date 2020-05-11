@@ -60,10 +60,6 @@ class BlogService extends CoreService {
       });
   }
 
-  titleSlugify(title) {
-    return title.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "-and-");
-  }
-
   createRecord(req, res) {
     this.db
       .create({
@@ -72,12 +68,7 @@ class BlogService extends CoreService {
       .then((newRecord) => {
         res.json(newRecord);
 
-        subscriberService.sendBlogEmail(
-          newRecord.title,
-          `${req.headers["origin"]}/blog/${newRecord.id}/${this.titleSlugify(
-            newRecord.title
-          )}`
-        );
+        subscriberService.sendBlogEmail(newRecord, req.headers["origin"]);
       })
       .catch(() =>
         res.status(500).json({

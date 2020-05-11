@@ -12,7 +12,14 @@ class SubscriberService extends CoreService {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   }
 
-  sendBlogEmail(blogTitle, blogLink) {
+  titleSlugify(title) {
+    return title.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "-and-");
+  }
+
+  sendBlogEmail(blog, origin) {
+    let blogLink = `${origin}/blog/${blog._id}/${this.titleSlugify(
+      blog.title
+    )}`;
     this.db
       .find({})
       .then((subscribers) => {
@@ -22,8 +29,12 @@ class SubscriberService extends CoreService {
             from: "ieee.az.sb@gmail.com",
             subject: "New article published, Check it now!",
             html: `
-              <h1> <a href="${blogLink}"> ${blogTitle} </a> </h1>
-              <p> Be the first to check it out </p>
+              <div style="text-align: center;">
+                <img src="${blog.cover}" />
+                <h1> ${blog.title} </h1>
+                <p> ${blog.metaDescription} </p>
+                <a href="${blogLink}"> Read it now !</a>
+              </div>
             `,
           };
           return sgMail.send(msg);
