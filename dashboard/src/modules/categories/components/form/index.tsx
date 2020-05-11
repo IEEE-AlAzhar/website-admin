@@ -3,38 +3,67 @@ import React, { Component } from "react";
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
 
+import { Category } from "configurations/interfaces/category.interface";
+import CategoriesService from "modules/categories/services/categories.service";
+
 import Loading from "shared/loading";
 import FormInput from "shared/Input";
-import { Email } from "configurations/interfaces/email.interface";
 
 interface Prop {
   isModalOpened: boolean;
-  onSubmit: (item: Email) => Promise<void>;
+  onSubmit: (item: any, submit: boolean, id?: string) => Promise<void>;
   closeModal: () => void;
   itemToBeEdited?: any;
   isSubmitting?: boolean;
 }
 
 interface State {
-  email: Email;
+  category: Category;
   isLoading: boolean;
 }
 
-export default class EmailForm extends Component<Prop, State> {
+export default class BestMemberForm extends Component<Prop, State> {
   state = {
-    email: {
-      subject: "",
-      body: "",
+    category: {
+      name: "",
     },
     isLoading: false,
+  };
+
+  _categoryService: CategoriesService;
+
+  constructor(props: Prop) {
+    super(props);
+    this._categoryService = new CategoriesService();
+  }
+
+  componentDidMount() {
+    let { itemToBeEdited } = this.props;
+
+    if (itemToBeEdited) {
+      itemToBeEdited.date = this.formatDate();
+      this.setState({ category: itemToBeEdited });
+    }
+  }
+
+  formatDate = () => {
+    let currentDateTime = new Date();
+    let formattedDate =
+      currentDateTime.getFullYear() +
+      "-" +
+      (currentDateTime.getMonth() + 1) +
+      "-" +
+      currentDateTime.getDate();
+
+    return formattedDate;
   };
 
   handleChange = (e: React.FormEvent<HTMLInputElement>): void => {
     let { name, value } = e.currentTarget;
 
     this.setState({
-      email: {
-        ...this.state.email,
+      category: {
+        ...this.state.category,
         [name]: value,
       } as any,
     });
@@ -43,11 +72,11 @@ export default class EmailForm extends Component<Prop, State> {
   handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    let { email } = this.state;
+    let { category } = this.state;
 
-    this.props.onSubmit(email).then(() => {
-      this.resetObj(email);
-      this.setState({ email: email });
+    this.props.onSubmit(category, true).then(() => {
+      this.resetObj(category);
+      this.setState({ category: category });
     });
   };
 
@@ -58,8 +87,13 @@ export default class EmailForm extends Component<Prop, State> {
   }
 
   render() {
-    let { isModalOpened, closeModal, isSubmitting } = this.props;
-    let { email, isLoading } = this.state;
+    let {
+      isModalOpened,
+      itemToBeEdited,
+      closeModal,
+      isSubmitting,
+    } = this.props;
+    let { category, isLoading } = this.state;
 
     return (
       <Modal
@@ -78,35 +112,19 @@ export default class EmailForm extends Component<Prop, State> {
           <Loading />
         ) : (
           <>
-            <h3 className="mb-3"> Email </h3>
+            <h3 className="mb-3"> Categories </h3>
             <form onSubmit={this.handleSubmit}>
               <div className="row">
                 <div className="form-group col-md-12">
                   <FormInput
                     type="text"
                     required={true}
-                    placeholder="Email Subject"
-                    label="subject"
-                    id="subject"
-                    name="subject"
+                    placeholder="Name of the category"
+                    label="Category name"
+                    id="name"
+                    name="name"
                     errorPosition="bottom"
-                    value={email.subject}
-                    onChange={this.handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="form-group col-12">
-                  <FormInput
-                    type="textarea"
-                    required={true}
-                    label="body"
-                    id="body"
-                    name="body"
-                    rows="5"
-                    errorPosition="bottom"
-                    value={email.body}
+                    value={category.name}
                     onChange={this.handleChange}
                   />
                 </div>
@@ -117,7 +135,11 @@ export default class EmailForm extends Component<Prop, State> {
                 className="btn btn-primary"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Sending ..." : "Send"}
+                {isSubmitting
+                  ? "Loading ..."
+                  : itemToBeEdited
+                  ? "Save"
+                  : "Create"}
               </button>
             </form>
           </>

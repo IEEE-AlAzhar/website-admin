@@ -2,11 +2,15 @@ import React, { Component } from "react";
 
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
+import Multiselect from "react-widgets/lib/Multiselect";
+import JoditEditor from "jodit-react";
+import SweetAlert from "react-bootstrap-sweetalert";
 
-import { Announcement } from "configurations/interfaces/announcement.interface";
+import { Article } from "configurations/interfaces/article.interface";
 import Loading from "shared/loading";
 import FormInput from "shared/Input";
 import ImageInput from "shared/image-input";
+import CategoriesService from "modules/categories/services/categories.service";
 
 interface Prop {
   isModalOpened: boolean;
@@ -17,37 +21,55 @@ interface Prop {
 }
 
 interface State {
-  announcement: Announcement;
+  article: Article;
   isLoading: boolean;
   isImageUploading: boolean;
+  categories: any[];
+  errorAlert: string;
 }
 
-export default class AnnouncementForm extends Component<Prop, State> {
+export default class ArticleForm extends Component<Prop, State> {
   state = {
-    announcement: {
+    article: {
       title: "",
       body: "",
       cover: "",
-      type: "",
+      metaDescription: "",
+      categories: [] as string[],
     },
+    categories: [] as any[],
+    errorAlert: "",
     isLoading: false,
     isImageUploading: false,
   };
+
+  _categoriesService: CategoriesService;
+
+  constructor(props: Prop) {
+    super(props);
+    this._categoriesService = new CategoriesService();
+  }
 
   componentDidMount() {
     let { itemToBeEdited } = this.props;
 
     if (itemToBeEdited) {
       itemToBeEdited.date = this.formatDate();
-      this.setState({ announcement: itemToBeEdited });
+      this.setState({ article: itemToBeEdited });
     }
+
+    this._categoriesService.list().then((response) => {
+      this.setState({
+        categories: response,
+      });
+    });
   }
 
   setImageUpload = (status: boolean, imageUrl?: string) => {
     this.setState({ isImageUploading: status });
     if (imageUrl)
       this.setState({
-        announcement: { ...this.state.announcement, cover: imageUrl } as any,
+        article: { ...this.state.article, cover: imageUrl } as any,
       });
   };
 
@@ -67,32 +89,39 @@ export default class AnnouncementForm extends Component<Prop, State> {
     let { name, value } = e.currentTarget;
 
     this.setState({
-      announcement: {
-        ...this.state.announcement,
+      article: {
+        ...this.state.article,
         [name]: value,
       } as any,
     });
   };
 
+  handleCreate = (name: string) => {
+    this._categoriesService
+      .create({name})
+      .then((response) => {
+        this.setState({
+          article: {
+            ...this.state.article,
+            categories: [...this.state.article.categories, response],
+          },
+          categories: [...this.state.categories, response]
+        });
+      })
+      .catch((err) => {
+        this.setState({ errorAlert: err.response.data.msg });
+      });
+  };
+
   handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    let { announcement } = this.state;
+    let { article } = this.state;
 
-    this.setState(
-      {
-        announcement: {
-          ...announcement,
-          date: this.formatDate(),
-        } as any,
-      },
-      () => {
-        this.props.onSubmit(this.state.announcement, true).then(() => {
-          this.setState({ announcement: announcement });
-          this.resetObj(announcement);
-        });
-      }
-    );
+    this.props.onSubmit(article, true).then(() => {
+      this.resetObj(article);
+      this.setState({ article: article });
+    });
   };
 
   resetObj(obj: any) {
@@ -102,13 +131,16 @@ export default class AnnouncementForm extends Component<Prop, State> {
   }
 
   render() {
+    const config = {
+      readonly: false,
+    };
     let {
       isModalOpened,
       itemToBeEdited,
       closeModal,
       isSubmitting,
     } = this.props;
-    let { announcement, isLoading, isImageUploading } = this.state;
+    let { article, isLoading, isImageUploading, categories, errorAlert } = this.state;
 
     return (
       <Modal
@@ -127,7 +159,7 @@ export default class AnnouncementForm extends Component<Prop, State> {
           <Loading />
         ) : (
           <>
-            <h3 className="mb-3"> Announcement </h3>
+            <h3 className="mb-3"> Article </h3>
             <form onSubmit={this.handleSubmit}>
               <div className="row">
                 <div className="form-group col-md-6">
@@ -139,22 +171,28 @@ export default class AnnouncementForm extends Component<Prop, State> {
                     id="title"
                     name="title"
                     errorPosition="bottom"
-                    value={announcement.title}
+                    value={article.title}
                     onChange={this.handleChange}
                   />
                 </div>
                 <div className="form-group col-md-6">
-                  <FormInput
-                    type="select"
-                    className="form-control"
-                    options={["General", "Technical", "Operation"]}
-                    required={true}
-                    label="Type"
-                    id="type"
-                    name="type"
-                    errorPosition="bottom"
-                    value={announcement.type}
-                    onChange={this.handleChange}
+                  <label htmlFor="category">Categories</label>
+                  <Multiselect
+                    id="category"
+                    data={categories}
+                    textField="name"
+                    valueField="id"
+                    value={article.categories}
+                    allowCreate="onFilter"
+                    onCreate={(name) => this.handleCreate(name)}
+                    onChange={(value) =>
+                      this.setState({
+                        article: {
+                          ...article,
+                          categories: value,
+                        },
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -164,19 +202,34 @@ export default class AnnouncementForm extends Component<Prop, State> {
                   <FormInput
                     type="textarea"
                     required={true}
-                    label="body"
-                    id="body"
-                    name="body"
-                    rows="5"
+                    label="Meta Description"
+                    placeholder="A short description for SEO"
+                    id="metaDescription"
+                    name="metaDescription"
+                    rows="3"
                     errorPosition="bottom"
-                    value={announcement.body}
+                    value={article.metaDescription}
                     onChange={this.handleChange}
+                  />
+                </div>
+                <div className="form-group col-12">
+                  <JoditEditor
+                    value={article.body}
+                    config={config}
+                    onBlur={(newContent) => {
+                      this.setState({
+                        article: {
+                          ...article,
+                          body: newContent,
+                        },
+                      });
+                    }}
                   />
                 </div>
               </div>
 
               <ImageInput
-                imgUrl={announcement.cover}
+                imgUrl={article.cover}
                 setImageUpload={this.setImageUpload}
               />
 
@@ -196,6 +249,15 @@ export default class AnnouncementForm extends Component<Prop, State> {
             </form>
           </>
         )}
+        <SweetAlert
+          show={!!errorAlert}
+          warning
+          title="An error occurred"
+          timeout={2000}
+          onConfirm={() => this.setState({ errorAlert: null })}
+        >
+          {errorAlert}
+        </SweetAlert>
       </Modal>
     );
   }

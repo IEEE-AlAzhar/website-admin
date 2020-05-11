@@ -16,7 +16,8 @@
     "isolatedModules": true,
     "typeRoots": ["node_modules/@types"],
     "noEmit": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "declaration": true
   },
   "include": ["src"]
 }

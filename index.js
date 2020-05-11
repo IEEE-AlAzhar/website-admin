@@ -27,6 +27,12 @@ app.use("/api/announcements", announcementController);
 const bestMemberController = require("./controllers/best-members.controller");
 app.use("/api/best-members", bestMemberController);
 
+const categoriesController = require("./controllers/category.controller");
+app.use("/api/categories", categoriesController);
+
+const blogController = require("./controllers/blog.controller");
+app.use("/api/blog", blogController);
+
 const committeeController = require("./controllers/committees.controller");
 app.use("/api/committees", committeeController);
 

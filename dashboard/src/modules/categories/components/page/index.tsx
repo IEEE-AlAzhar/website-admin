@@ -3,15 +3,15 @@ import React, { Component } from "react";
 import AdminLayout from "shared/admin-layout";
 import AdminTable from "shared/admin-table";
 import Loading from "shared/loading";
-import AnnouncementForm from "../form";
+import BestMemberForm from "../form";
 
 import UserService from "modules/users/services/user.service";
-import AnnouncementService from "modules/announcements/services/announcement.service";
-import { Announcement } from "configurations/interfaces/announcement.interface";
+import { Category } from "configurations/interfaces/category.interface";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import CategoriesService from "modules/categories/services/categories.service";
 
 interface Prop {
   history: {
@@ -20,8 +20,8 @@ interface Prop {
 }
 
 interface State {
-  announcements: Announcement[];
-  announcementToBeEdited?: Announcement | null;
+  categories: Category[];
+  categoryToBeEdited?: Category | null;
   successAlert: string;
   errorAlert: string;
   isLoading: boolean;
@@ -30,30 +30,30 @@ interface State {
   idOfItemToBeDeleted: string;
 }
 
-export default class AnnouncementsListPage extends Component<Prop, State> {
+export default class CategoriesListPage extends Component<Prop, State> {
   tableConfig = {
-    tableHeaders: ["title", "type"],
+    tableHeaders: ["name"],
     className: "table-striped",
     actions: ["edit", "delete"],
   };
 
   state = {
-    announcements: [] as Announcement[],
+    categories: [] as Category[],
     successAlert: "",
     errorAlert: "",
-    announcementToBeEdited: {} as Announcement,
+    categoryToBeEdited: {} as Category,
     isLoading: false,
     isCreateModalOpened: false,
     isSubmitting: false,
     idOfItemToBeDeleted: "",
   };
 
-  public _announcementService: AnnouncementService;
+  public _categoriesService: CategoriesService;
   public _userService: UserService;
 
   constructor(props: Prop) {
     super(props);
-    this._announcementService = new AnnouncementService();
+    this._categoriesService = new CategoriesService();
     this._userService = new UserService();
   }
 
@@ -62,29 +62,29 @@ export default class AnnouncementsListPage extends Component<Prop, State> {
       return this.props.history.push("/login");
     this.setState({ isLoading: true });
     try {
-      let announcements = await this._announcementService.list();
+      let categories = await this._categoriesService.list();
 
-      this.setState({ announcements, isLoading: false });
+      this.setState({ categories, isLoading: false });
     } catch {
       this.setState({ errorAlert: "Error retrieving items", isLoading: false });
     }
   }
 
-  createAnnouncement = (announcement: Announcement) => {
-    let { announcements } = this.state;
+  createCategory = (category: Category) => {
+    let { categories } = this.state;
 
     this.setState({
       isSubmitting: true,
     });
 
-    return this._announcementService
-      .create(announcement)
+    return this._categoriesService
+      .create(category)
       .then((response) => {
-        announcements.unshift(response as never);
+        categories.unshift(response as never);
 
         this.setState({
-          announcements,
-          successAlert: "Announcement added successfully",
+          categories,
+          successAlert: "Category added successfully",
           errorAlert: "",
           isCreateModalOpened: false,
           isSubmitting: false,
@@ -99,24 +99,24 @@ export default class AnnouncementsListPage extends Component<Prop, State> {
       });
   };
 
-  editAnnouncement = (
-    announcement: Announcement,
+  editCategory = (
+    category: Category,
     submit: boolean,
-    id = this.state.announcementToBeEdited._id
+    id = this.state.categoryToBeEdited._id
   ) => {
     if (submit) {
       this.setState({
         isSubmitting: true,
       });
-      return this._announcementService
-        .update(id, announcement)
+      return this._categoriesService
+        .update(id, category)
         .then((response) => {
-          this.updateStateWithNewAnnouncement(response);
+          this.updateStateWithNewCategory(response);
           this.setState({
             isSubmitting: false,
-            successAlert: "Announcement updated successfully",
+            successAlert: "Category updated successfully",
             errorAlert: "",
-            announcementToBeEdited: {} as Announcement,
+            categoryToBeEdited: {} as Category,
           });
         })
         .catch((err) => {
@@ -127,33 +127,36 @@ export default class AnnouncementsListPage extends Component<Prop, State> {
     } else {
       this.setState({
         isSubmitting: false,
-        announcementToBeEdited: announcement,
+        categoryToBeEdited: category,
       });
     }
   };
 
-  updateStateWithNewAnnouncement = (announcement: Announcement) => {
-    let { announcements } = this.state;
-    let objectToUpdateIndex: number = announcements.findIndex(
-      (item: Announcement) => item._id === announcement._id
+  updateStateWithNewCategory = (category: Category) => {
+    let { categories } = this.state;
+    let objectToUpdateIndex: number = categories.findIndex(
+      (item: Category) => item._id === category._id
     );
 
-    announcements.splice(objectToUpdateIndex, 1, announcement as never);
+    categories.splice(objectToUpdateIndex, 1, category as never);
 
-    this.setState({ announcements });
+    this.setState({ categories });
   };
 
-  removeAnnouncement = (id: string, submit?: boolean) => {
-    let { announcements } = this.state;
+  removeCategory = (id: string, submit?: boolean) => {
+    let { categories } = this.state;
 
     if (submit) {
-      this._announcementService.delete(id).then(() => {
-        this.setState({
-          announcements: announcements.filter(
-            (item: Announcement) => item._id !== id
-          ),
+      this._categoriesService
+        .delete(id)
+        .then(() => {
+          this.setState({
+            categories: categories.filter((item: Category) => item._id !== id),
+          });
+        })
+        .catch((err) => {
+          this.setState({ errorAlert: err.response.data.msg });
         });
-      });
     } else {
       this.setState({
         idOfItemToBeDeleted: id,
@@ -163,10 +166,10 @@ export default class AnnouncementsListPage extends Component<Prop, State> {
 
   render() {
     let {
-      announcements,
+      categories,
       successAlert,
       errorAlert,
-      announcementToBeEdited,
+      categoryToBeEdited,
       idOfItemToBeDeleted,
       isLoading,
       isCreateModalOpened,
@@ -176,49 +179,49 @@ export default class AnnouncementsListPage extends Component<Prop, State> {
     return (
       <AdminLayout>
         <header className="d-flex justify-content-between container mt-5">
-          <h2> Announcements </h2>
+          <h2> Categories </h2>
           <button
             className="btn btn-success"
             onClick={() => this.setState({ isCreateModalOpened: true })}
           >
-            <FontAwesomeIcon icon={faPlus} /> Create New Announcement
+            <FontAwesomeIcon icon={faPlus} /> Create New Category
           </button>
         </header>
         {isLoading ? (
           <div className="text-center mt-5">
             <Loading />
           </div>
-        ) : announcements.length > 0 ? (
+        ) : categories.length > 0 ? (
           <div className="container mt-5">
             <AdminTable
               config={this.tableConfig}
-              triggerEditEvent={this.editAnnouncement}
-              deleteRow={this.removeAnnouncement}
-              tableBody={announcements as any}
+              triggerEditEvent={this.editCategory}
+              deleteRow={this.removeCategory}
+              tableBody={categories as any}
             />
           </div>
         ) : (
           <div className="text-center my-5">
-            <p>No Announcements yet</p>
+            <p>No Categories yet</p>
           </div>
         )}
 
-        {Object.keys(announcementToBeEdited).length > 1 && (
-          <AnnouncementForm
-            isModalOpened={Object.keys(announcementToBeEdited).length > 1}
-            itemToBeEdited={announcementToBeEdited}
-            onSubmit={this.editAnnouncement}
+        {Object.keys(categoryToBeEdited).length > 1 && (
+          <BestMemberForm
+            isModalOpened={Object.keys(categoryToBeEdited).length > 1}
+            itemToBeEdited={categoryToBeEdited}
+            onSubmit={this.editCategory}
             isSubmitting={isSubmitting}
             closeModal={() =>
-              this.setState({ announcementToBeEdited: {} as Announcement })
+              this.setState({ categoryToBeEdited: {} as Category })
             }
           />
         )}
 
-        <AnnouncementForm
+        <BestMemberForm
           isModalOpened={isCreateModalOpened}
           isSubmitting={isSubmitting}
-          onSubmit={this.createAnnouncement}
+          onSubmit={this.createCategory}
           closeModal={() => this.setState({ isCreateModalOpened: false })}
         />
 
@@ -247,7 +250,7 @@ export default class AnnouncementsListPage extends Component<Prop, State> {
           confirmBtnBsStyle="danger"
           title="Are you sure?"
           onConfirm={() => {
-            this.removeAnnouncement(idOfItemToBeDeleted, true);
+            this.removeCategory(idOfItemToBeDeleted, true);
             this.setState({ idOfItemToBeDeleted: "" });
           }}
           onCancel={() => this.setState({ idOfItemToBeDeleted: "" })}

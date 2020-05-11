@@ -5,8 +5,10 @@ import CommitteesListPage from "modules/committees/components/committeesListPage
 import BestMembersListPage from "modules/best-members/components/page";
 import MessagesListPage from "modules/messages/components/messagesListPage";
 import SubscribersListPage from "modules/subscribtion/components/subscribersListPage";
+import CategoriesListPage from "modules/categories/components/page";
 
 import { RouteStructure } from "configurations/interfaces/route.interface";
+import ArticlesListPage from "modules/blog/components/page";
 
 export let adminRoutes: RouteStructure[] = [
   {
@@ -18,6 +20,16 @@ export let adminRoutes: RouteStructure[] = [
   {
     path: "/login",
     component: LoginPage,
+  },
+  {
+    path: "/blog",
+    label: "Blog",
+    component: ArticlesListPage,
+  },
+  {
+    path: "/categories",
+    label: "Blog Categories",
+    component: CategoriesListPage,
   },
   {
     path: "/committees",

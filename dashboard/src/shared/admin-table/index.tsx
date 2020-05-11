@@ -57,6 +57,13 @@ export default class AdminTable extends Component<Prop> {
                 </Link>
               </td>
             );
+          } else if (keyHeader === "createdAt" || keyHeader === "created_at") {
+            return (
+              <td key={keyHeader}>
+                {" "}
+                {new Date(item[keyHeader]).toUTCString().slice(5, 16)}{" "}
+              </td>
+            );
           } else {
             return <td key={keyHeader}> {item[keyHeader]} </td>;
           }

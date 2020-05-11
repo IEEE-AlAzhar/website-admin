@@ -30,7 +30,7 @@ class CoreService {
       .then((newRecord) => res.json(newRecord))
       .catch(() =>
         res.status(500).json({
-          msg: "An error occurred, please try again later!",
+          msg: `An error occurred while adding new ${this.name}, please try again later!`,
         })
       );
   }
