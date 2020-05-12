@@ -9,6 +9,8 @@ interface Prop {
   setImageUpload: (status: boolean, imageUrl?: string) => void;
   imgUrl: string;
   name?: string;
+  label?: string;
+  id?: string;
 }
 
 interface State {
@@ -30,7 +32,7 @@ export default class ImageInput extends Component<Prop, State> {
     uploadImage(files && files[0]).then((res) => {
       this.setState({
         isImageUploaded: true,
-        image: res.data.secure_url,
+        // image: res.data.secure_url,
       });
 
       setImageUpload(false, res.data.secure_url);
@@ -39,12 +41,14 @@ export default class ImageInput extends Component<Prop, State> {
 
   renderImageUpload = () => (
     <div className="form-group">
-      <label htmlFor="cover">Upload Image</label>
+      <label htmlFor={this.props.id || "cover"}>
+        {this.props.label || "Upload Image"}
+      </label>
       <input
         type="file"
         onChange={this.handleImageInputChange}
         className="form-control-file"
-        id="cover"
+        id={this.props.id || "cover"}
         accept="image/*"
         name={this.props.name || "cover"}
       />
@@ -69,6 +73,10 @@ export default class ImageInput extends Component<Prop, State> {
     this.setState({ isImageUploaded: false, image: "" });
   };
 
+  componentDidMount() {
+    if (this.props.imgUrl) this.setState({ image: this.props.imgUrl });
+  }
+
   componentDidUpdate(prevProps: any) {
     if (
       this.props.imgUrl !== this.state.image &&
@@ -79,13 +87,7 @@ export default class ImageInput extends Component<Prop, State> {
   }
 
   render() {
-    let { isImageUploaded, image } = this.state;
-    return (
-      <>
-        {!isImageUploaded && !image
-          ? this.renderImageUpload()
-          : this.renderImagePreview()}
-      </>
-    );
+    let { image } = this.state;
+    return <>{!image ? this.renderImageUpload() : this.renderImagePreview()}</>;
   }
 }

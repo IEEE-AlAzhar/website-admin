@@ -6,9 +6,10 @@ import BestMembersListPage from "modules/best-members/components/page";
 import MessagesListPage from "modules/messages/components/messagesListPage";
 import SubscribersListPage from "modules/subscribtion/components/subscribersListPage";
 import CategoriesListPage from "modules/categories/components/page";
+import ArticlesListPage from "modules/blog/components/page";
+import EventsListPage from "modules/events/components/eventsListPage";
 
 import { RouteStructure } from "configurations/interfaces/route.interface";
-import ArticlesListPage from "modules/blog/components/page";
 
 export let adminRoutes: RouteStructure[] = [
   {
@@ -30,6 +31,11 @@ export let adminRoutes: RouteStructure[] = [
     path: "/categories",
     label: "Blog Categories",
     component: CategoriesListPage,
+  },
+  {
+    path: "/events",
+    label: "Events",
+    component: EventsListPage,
   },
   {
     path: "/committees",
