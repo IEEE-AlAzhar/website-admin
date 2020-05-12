@@ -111,8 +111,7 @@ export default class LoginPage extends Component<Prop, State> {
             <div className="form-group">
               <FormInput
                 type="text"
-                required={true}
-                placeholder="Username"
+                placeholder="Who are you ?"
                 label="Username"
                 id="username"
                 name="username"
@@ -126,7 +125,7 @@ export default class LoginPage extends Component<Prop, State> {
               <FormInput
                 type="password"
                 className="form-control"
-                required={true}
+                placeholder="Write your password"
                 label="Password"
                 id="password"
                 name="password"

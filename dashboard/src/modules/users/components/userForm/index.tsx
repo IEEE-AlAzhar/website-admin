@@ -225,7 +225,7 @@ export default class UserForm extends Component<Prop, State> {
 
                 <div className="form-group col-md-6">
                   <FormInput
-                    type="password"
+                    type="text"
                     className="form-control"
                     required={true}
                     label="Password"
