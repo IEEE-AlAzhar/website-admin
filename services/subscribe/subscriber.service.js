@@ -62,7 +62,7 @@ class SubscriberService extends CoreService {
             html: `
               <div style="text-align: center;">
                 <h1> ${event.title} </h1>
-                <p> ${event.description} </p>
+                <p> ${event.metaDescription} </p>
                 <a href="${eventLink}"> Know more about it</a>
               </div>
             `,
