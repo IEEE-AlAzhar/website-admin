@@ -29,7 +29,7 @@ interface State {
 
 export default class MessagesListPage extends Component<Prop, State> {
   tableConfig = {
-    tableHeaders: ["name", "subject"],
+    tableHeaders: ["name", "email", "phone", "subject"],
     className: "table-striped",
     actions: ["view", "delete"],
   };
