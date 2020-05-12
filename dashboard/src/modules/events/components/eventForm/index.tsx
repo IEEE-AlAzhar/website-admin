@@ -39,6 +39,7 @@ export default class EventForm extends Component<Prop, State> {
     event: {
       title: "",
       description: "",
+      metaDescription: "",
       startDate: null as any,
       endDate: null as any,
       location: "",
@@ -120,7 +121,8 @@ export default class EventForm extends Component<Prop, State> {
       isEmpty(event.description) ||
       isEmpty(event.startDate) ||
       isEmpty(event.endDate) ||
-      isEmpty(event.cover)
+      isEmpty(event.cover) ||
+      isEmpty(event.metaDescription)
     ) {
       this.setState({
         errorAlert: "Please make sure to fill all the required fields !",
@@ -220,6 +222,20 @@ export default class EventForm extends Component<Prop, State> {
               </div>
 
               <div className="row">
+                <div className="form-group col-12">
+                  <FormInput
+                    type="textarea"
+                    required={true}
+                    label="Meta Description"
+                    placeholder="A short description for SEO"
+                    id="metaDescription"
+                    name="metaDescription"
+                    rows="3"
+                    errorPosition="bottom"
+                    value={event.metaDescription}
+                    onChange={this.handleChange}
+                  />
+                </div>
                 <div className="form-group col-12">
                   <label>
                     {" "}
