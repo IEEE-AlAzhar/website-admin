@@ -34,6 +34,8 @@ export default class ArticleForm extends Component<Prop, State> {
     article: {
       title: "",
       body: "",
+      authorName: "",
+      authorProfileLink: "",
       cover: "",
       metaDescription: "",
       categories: [] as string[],
@@ -123,7 +125,9 @@ export default class ArticleForm extends Component<Prop, State> {
       isEmpty(article.title) ||
       isEmpty(article.metaDescription) ||
       isEmpty(article.body) ||
-      isEmpty(article.cover)
+      isEmpty(article.cover) ||
+      isEmpty(article.authorName) ||
+      isEmpty(article.authorProfileLink)
     ) {
       this.setState({
         errorAlert: "Please make sure to fill all the required fields !",
@@ -246,6 +250,35 @@ export default class ArticleForm extends Component<Prop, State> {
                         },
                       });
                     }}
+                  />
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="form-group col-md-6">
+                  <FormInput
+                    type="text"
+                    required={true}
+                    placeholder="Name of the author"
+                    label="Author Name"
+                    id="authorName"
+                    name="authorName"
+                    errorPosition="bottom"
+                    value={article.authorName}
+                    onChange={this.handleChange}
+                  />
+                </div>
+                <div className="form-group col-md-6">
+                  <FormInput
+                    type="text"
+                    required={true}
+                    placeholder="Link of the facebook profile of the author"
+                    label="Author Profile Link"
+                    id="authorProfileLink"
+                    name="authorProfileLink"
+                    errorPosition="bottom"
+                    value={article.authorProfileLink}
+                    onChange={this.handleChange}
                   />
                 </div>
               </div>

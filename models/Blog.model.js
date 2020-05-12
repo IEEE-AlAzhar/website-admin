@@ -11,6 +11,14 @@ const BlogSchema = new Schema(
       type: String,
       required: true,
     },
+    authorName: {
+      type: String,
+      required: true,
+    },
+    authorProfileLink: {
+      type: String,
+      required: true,
+    },
     metaDescription: {
       type: String,
       required: true,

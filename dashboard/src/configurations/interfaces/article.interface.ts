@@ -3,6 +3,8 @@ export interface Article {
   title: string;
   body: string;
   metaDescription: string;
+  authorName: string;
+  authorProfileLink: string;
   cover: string;
   categories: string[];
   createdAt?: string;
