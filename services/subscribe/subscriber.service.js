@@ -30,10 +30,40 @@ class SubscriberService extends CoreService {
             subject: "New article published, Check it now!",
             html: `
               <div style="text-align: center;">
-                <img src="${blog.cover}" />
                 <h1> ${blog.title} </h1>
                 <p> ${blog.metaDescription} </p>
                 <a href="${blogLink}"> Read it now !</a>
+              </div>
+            `,
+          };
+          return sgMail.send(msg);
+        });
+      })
+      .then(() => {
+        res.json({ msg: "Emails sent successfully !" });
+      })
+      .catch(() => {
+        res
+          .status(500)
+          .json({ msg: "An Error occurred, please try again later" });
+      });
+  }
+
+  sendEventEmail(event, origin) {
+    let eventLink = `${origin}/events/${event._id}`;
+    this.db
+      .find({})
+      .then((subscribers) => {
+        subscribers.forEach(({ email }) => {
+          const msg = {
+            to: email,
+            from: "ieee.az.sb@gmail.com",
+            subject: "New event added, Check it now!",
+            html: `
+              <div style="text-align: center;">
+                <h1> ${event.title} </h1>
+                <p> ${event.description} </p>
+                <a href="${eventLink}"> Know more about it</a>
               </div>
             `,
           };

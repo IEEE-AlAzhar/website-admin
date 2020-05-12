@@ -21,14 +21,14 @@ mongoose
 app.use(express.json());
 app.use(cors());
 
-const announcementController = require("./controllers/announcements.controller.js");
-app.use("/api/announcements", announcementController);
-
 const bestMemberController = require("./controllers/best-members.controller");
 app.use("/api/best-members", bestMemberController);
 
 const categoriesController = require("./controllers/category.controller");
 app.use("/api/categories", categoriesController);
+
+const eventController = require("./controllers/event.controller");
+app.use("/api/events", eventController);
 
 const blogController = require("./controllers/blog.controller");
 app.use("/api/blog", blogController);

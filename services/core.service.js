@@ -1,5 +1,6 @@
 class CoreService {
   constructor() {
+    this.getById = this.getById.bind(this);
     this.listRecords = this.listRecords.bind(this);
     this.createRecord = this.createRecord.bind(this);
     this.updateRecord = this.updateRecord.bind(this);
@@ -9,6 +10,20 @@ class CoreService {
   initialize(Model, name) {
     this.db = Model;
     this.name = name;
+  }
+
+  getById(req, res) {
+    let { id } = req.params;
+
+    this.db
+      .findById(id)
+      .then((record) => {
+        if (!record) return res.status(404).json({ msg: "Item not found !" });
+        res.json(record);
+      })
+      .catch(() => {
+        res.json({ msg: "An error occurred !" });
+      });
   }
 
   listRecords(req, res) {
