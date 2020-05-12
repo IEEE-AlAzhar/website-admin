@@ -49,8 +49,7 @@ class SubscriberService extends CoreService {
       });
   }
 
-  sendEventEmail(event, origin) {
-    let eventLink = `${origin}/events/${event._id}`;
+  sendEventEmail(event) {
     this.db
       .find({})
       .then((subscribers) => {

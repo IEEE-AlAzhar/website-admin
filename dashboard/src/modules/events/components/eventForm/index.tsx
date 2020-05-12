@@ -122,7 +122,8 @@ export default class EventForm extends Component<Prop, State> {
       isEmpty(event.startDate) ||
       isEmpty(event.endDate) ||
       isEmpty(event.cover) ||
-      isEmpty(event.metaDescription)
+      isEmpty(event.metaDescription) ||
+      isEmpty(event.status)
     ) {
       this.setState({
         errorAlert: "Please make sure to fill all the required fields !",
@@ -207,7 +208,7 @@ export default class EventForm extends Component<Prop, State> {
               </div>
 
               <div className="row">
-                <div className="form-group col-12">
+                <div className="form-group col-6">
                   <FormInput
                     type="text"
                     className="form-control"
@@ -219,39 +220,18 @@ export default class EventForm extends Component<Prop, State> {
                     onChange={this.handleChange}
                   />
                 </div>
-              </div>
-
-              <div className="row">
-                <div className="form-group col-12">
+                <div className="form-group col-6">
                   <FormInput
-                    type="textarea"
+                    type="select"
+                    options={["upcoming", "past"]}
+                    className="form-control"
                     required={true}
-                    label="Meta Description"
-                    placeholder="A short description for SEO"
-                    id="metaDescription"
-                    name="metaDescription"
-                    rows="3"
+                    label="Status"
+                    id="status"
+                    name="status"
                     errorPosition="bottom"
-                    value={event.metaDescription}
+                    value={event.status}
                     onChange={this.handleChange}
-                  />
-                </div>
-                <div className="form-group col-12">
-                  <label>
-                    {" "}
-                    Event Description <span className="error">*</span>{" "}
-                  </label>
-                  <JoditEditor
-                    value={event.description}
-                    config={config}
-                    onBlur={(newContent) => {
-                      this.setState({
-                        event: {
-                          ...event,
-                          description: newContent,
-                        },
-                      });
-                    }}
                   />
                 </div>
               </div>
@@ -293,13 +273,44 @@ export default class EventForm extends Component<Prop, State> {
                       ) as Date
                     }
                     onChange={(value) => {
-                      let status = value < new Date() ? "past" : "upcoming";
-
                       this.setState({
                         event: {
                           ...event,
                           endDate: value.toString(),
-                          status,
+                        },
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="form-group col-12 mt-4">
+                  <FormInput
+                    type="textarea"
+                    required={true}
+                    label="Meta Description"
+                    placeholder="A short description for SEO"
+                    id="metaDescription"
+                    name="metaDescription"
+                    rows="3"
+                    errorPosition="bottom"
+                    value={event.metaDescription}
+                    onChange={this.handleChange}
+                  />
+                </div>
+                <div className="form-group col-12">
+                  <label>
+                    Event Description <span className="error">*</span>
+                  </label>
+                  <JoditEditor
+                    value={event.description}
+                    config={config}
+                    onBlur={(newContent) => {
+                      this.setState({
+                        event: {
+                          ...event,
+                          description: newContent,
                         },
                       });
                     }}
