@@ -50,6 +50,7 @@ class BlogService extends CoreService {
 
     this.db
       .findById(id)
+      .sort({ createdAt: "desc" })
       .populate("categories")
       .then((blog) => {
         if (!blog) return res.status(404).json({ msg: "Article not found !" });
