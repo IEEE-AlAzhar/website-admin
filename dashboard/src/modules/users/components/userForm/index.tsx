@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
+import SweetAlert from "react-bootstrap-sweetalert";
 
 import { User } from "configurations/interfaces/user.interface";
 import { Committee } from "configurations/interfaces/committee.interface";
@@ -9,6 +10,7 @@ import CommitteeService from "modules/committees/services/committee.service";
 
 import Loading from "shared/loading";
 import FormInput from "shared/Input";
+import { isEmpty } from "shared/services/validation.service";
 
 interface Prop {
   isModalOpened: boolean;
@@ -23,6 +25,7 @@ interface State {
   isLoading: boolean;
   isImageUploading: boolean;
   committees: string[];
+  errorAlert: string;
 }
 
 export default class UserForm extends Component<Prop, State> {
@@ -36,6 +39,7 @@ export default class UserForm extends Component<Prop, State> {
     committees: [] as string[],
     isLoading: false,
     isImageUploading: false,
+    errorAlert: "",
   };
 
   _committeeService: CommitteeService;
@@ -96,19 +100,21 @@ export default class UserForm extends Component<Prop, State> {
 
     let { user } = this.state;
 
-    this.setState(
-      {
-        user: {
-          ...user,
-        } as any,
-      },
-      () => {
-        this.props.onSubmit(this.state.user, true).then(() => {
-          this.resetObj(user);
-          this.setState({ user: user });
-        });
-      }
-    );
+    if (
+      isEmpty(user.committee) ||
+      isEmpty(user.password) ||
+      isEmpty(user.type) ||
+      isEmpty(user.username)
+    ) {
+      this.setState({
+        errorAlert: "Please make sure to fill all the required fields !",
+      });
+    } else {
+      this.props.onSubmit(this.state.user, true).then(() => {
+        this.resetObj(user);
+        this.setState({ user: user });
+      });
+    }
   };
 
   resetObj(obj: any) {
@@ -142,7 +148,13 @@ export default class UserForm extends Component<Prop, State> {
       closeModal,
       isSubmitting,
     } = this.props;
-    let { user, isLoading, isImageUploading, committees } = this.state;
+    let {
+      user,
+      isLoading,
+      isImageUploading,
+      committees,
+      errorAlert,
+    } = this.state;
 
     return (
       <Modal
@@ -242,6 +254,15 @@ export default class UserForm extends Component<Prop, State> {
             </form>
           </>
         )}
+        <SweetAlert
+          show={!!errorAlert}
+          warning
+          title="An error occurred"
+          timeout={2000}
+          onConfirm={() => this.setState({ errorAlert: null })}
+        >
+          {errorAlert}
+        </SweetAlert>
       </Modal>
     );
   }

@@ -6,6 +6,7 @@ import JoditEditor from "jodit-react";
 import Moment from "moment";
 import momentLocalizer from "react-widgets-moment";
 import DateTimePicker from "react-widgets/lib/DateTimePicker";
+import SweetAlert from "react-bootstrap-sweetalert";
 
 import { Event } from "configurations/interfaces/event.interface";
 
@@ -13,6 +14,7 @@ import Loading from "shared/loading";
 import FormInput from "shared/Input";
 import EventService from "modules/events/services/event.service";
 import ImageInput from "shared/image-input";
+import { isEmpty } from "shared/services/validation.service";
 
 Moment.locale("en");
 momentLocalizer();
@@ -29,6 +31,7 @@ interface State {
   event: Event;
   isLoading: boolean;
   isImageUploading: boolean;
+  errorAlert: string;
 }
 
 export default class EventForm extends Component<Prop, State> {
@@ -44,6 +47,7 @@ export default class EventForm extends Component<Prop, State> {
       status: "",
       formLink: "",
     },
+    errorAlert: "",
     isLoading: false,
     isImageUploading: false,
   };
@@ -111,10 +115,22 @@ export default class EventForm extends Component<Prop, State> {
 
     let { event } = this.state;
 
-    this.props.onSubmit(event, true).then(() => {
-      this.resetObj(event);
-      this.setState({ event: event });
-    });
+    if (
+      isEmpty(event.title) ||
+      isEmpty(event.description) ||
+      isEmpty(event.startDate) ||
+      isEmpty(event.endDate) ||
+      isEmpty(event.cover)
+    ) {
+      this.setState({
+        errorAlert: "Please make sure to fill all the required fields !",
+      });
+    } else {
+      this.props.onSubmit(event, true).then(() => {
+        this.resetObj(event);
+        this.setState({ event: event });
+      });
+    }
   };
 
   resetObj(obj: any) {
@@ -139,7 +155,7 @@ export default class EventForm extends Component<Prop, State> {
       closeModal,
       isSubmitting,
     } = this.props;
-    let { event, isLoading, isImageUploading } = this.state;
+    let { event, isLoading, isImageUploading, errorAlert } = this.state;
 
     return (
       <Modal
@@ -178,7 +194,6 @@ export default class EventForm extends Component<Prop, State> {
                   <FormInput
                     type="url"
                     className="form-control"
-                    required={true}
                     label="Form Link"
                     id="formLink"
                     name="formLink"
@@ -194,8 +209,7 @@ export default class EventForm extends Component<Prop, State> {
                   <FormInput
                     type="text"
                     className="form-control"
-                    required={true}
-                    label="Location Link"
+                    label="Location"
                     id="location"
                     name="location"
                     errorPosition="bottom"
@@ -207,7 +221,10 @@ export default class EventForm extends Component<Prop, State> {
 
               <div className="row">
                 <div className="form-group col-12">
-                  <label> Event Description </label>
+                  <label>
+                    {" "}
+                    Event Description <span className="error">*</span>{" "}
+                  </label>
                   <JoditEditor
                     value={event.description}
                     config={config}
@@ -225,7 +242,9 @@ export default class EventForm extends Component<Prop, State> {
 
               <div className="row">
                 <div className="col-md-6">
-                  <label htmlFor="startDate">Start Date</label>
+                  <label htmlFor="startDate">
+                    Start Date <span className="error">*</span>
+                  </label>
                   <DateTimePicker
                     value={
                       this.convertDateStringIntoDateObject(
@@ -243,7 +262,9 @@ export default class EventForm extends Component<Prop, State> {
                   />
                 </div>
                 <div className="col-md-6">
-                  <label htmlFor="endDate">End Date</label>
+                  <label htmlFor="endDate">
+                    End Date <span className="error">*</span>
+                  </label>
                   <DateTimePicker
                     value={
                       this.convertDateStringIntoDateObject(
@@ -275,6 +296,7 @@ export default class EventForm extends Component<Prop, State> {
                   <ImageInput
                     imgUrl={event.cover}
                     name="cover"
+                    required={true}
                     id="cover"
                     label="Event Cover"
                     setImageUpload={this.setImageUpload}
@@ -317,7 +339,7 @@ export default class EventForm extends Component<Prop, State> {
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={isSubmitting || isImageUploading}
+                disabled={!!errorAlert || isSubmitting || isImageUploading}
               >
                 {isImageUploading
                   ? "Uploading..."
@@ -330,6 +352,16 @@ export default class EventForm extends Component<Prop, State> {
             </form>
           </>
         )}
+
+        <SweetAlert
+          show={!!errorAlert}
+          warning
+          title="An error occurred"
+          timeout={2000}
+          onConfirm={() => this.setState({ errorAlert: null })}
+        >
+          {errorAlert}
+        </SweetAlert>
       </Modal>
     );
   }

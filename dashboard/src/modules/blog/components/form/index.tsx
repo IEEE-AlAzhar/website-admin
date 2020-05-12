@@ -11,6 +11,7 @@ import Loading from "shared/loading";
 import FormInput from "shared/Input";
 import ImageInput from "shared/image-input";
 import CategoriesService from "modules/categories/services/categories.service";
+import { isEmpty } from "shared/services/validation.service";
 
 interface Prop {
   isModalOpened: boolean;
@@ -98,14 +99,14 @@ export default class ArticleForm extends Component<Prop, State> {
 
   handleCreate = (name: string) => {
     this._categoriesService
-      .create({name})
+      .create({ name })
       .then((response) => {
         this.setState({
           article: {
             ...this.state.article,
             categories: [...this.state.article.categories, response],
           },
-          categories: [...this.state.categories, response]
+          categories: [...this.state.categories, response],
         });
       })
       .catch((err) => {
@@ -118,10 +119,21 @@ export default class ArticleForm extends Component<Prop, State> {
 
     let { article } = this.state;
 
-    this.props.onSubmit(article, true).then(() => {
-      this.resetObj(article);
-      this.setState({ article: article });
-    });
+    if (
+      isEmpty(article.title) ||
+      isEmpty(article.metaDescription) ||
+      isEmpty(article.body) ||
+      isEmpty(article.cover)
+    ) {
+      this.setState({
+        errorAlert: "Please make sure to fill all the required fields !",
+      });
+    } else {
+      this.props.onSubmit(article, true).then(() => {
+        this.resetObj(article);
+        this.setState({ article: article });
+      });
+    }
   };
 
   resetObj(obj: any) {
@@ -140,7 +152,13 @@ export default class ArticleForm extends Component<Prop, State> {
       closeModal,
       isSubmitting,
     } = this.props;
-    let { article, isLoading, isImageUploading, categories, errorAlert } = this.state;
+    let {
+      article,
+      isLoading,
+      isImageUploading,
+      categories,
+      errorAlert,
+    } = this.state;
 
     return (
       <Modal
@@ -213,6 +231,10 @@ export default class ArticleForm extends Component<Prop, State> {
                   />
                 </div>
                 <div className="form-group col-12">
+                  <label>
+                    {" "}
+                    Body of the article <span className="error">*</span>{" "}
+                  </label>
                   <JoditEditor
                     value={article.body}
                     config={config}
@@ -230,6 +252,7 @@ export default class ArticleForm extends Component<Prop, State> {
 
               <ImageInput
                 imgUrl={article.cover}
+                required={true}
                 setImageUpload={this.setImageUpload}
               />
 

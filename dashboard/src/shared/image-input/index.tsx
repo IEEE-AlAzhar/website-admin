@@ -11,6 +11,7 @@ interface Prop {
   name?: string;
   label?: string;
   id?: string;
+  required?: boolean;
 }
 
 interface State {
@@ -42,7 +43,8 @@ export default class ImageInput extends Component<Prop, State> {
   renderImageUpload = () => (
     <div className="form-group">
       <label htmlFor={this.props.id || "cover"}>
-        {this.props.label || "Upload Image"}
+        {this.props.label || "Upload Image"}{" "}
+        {this.props.required && <span className="error">*</span>}
       </label>
       <input
         type="file"

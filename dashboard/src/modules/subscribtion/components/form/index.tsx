@@ -2,10 +2,12 @@ import React, { Component } from "react";
 
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
+import SweetAlert from "react-bootstrap-sweetalert";
 
 import Loading from "shared/loading";
 import FormInput from "shared/Input";
 import { Email } from "configurations/interfaces/email.interface";
+import { isEmpty } from "shared/services/validation.service";
 
 interface Prop {
   isModalOpened: boolean;
@@ -18,6 +20,7 @@ interface Prop {
 interface State {
   email: Email;
   isLoading: boolean;
+  errorAlert: string,
 }
 
 export default class EmailForm extends Component<Prop, State> {
@@ -27,6 +30,7 @@ export default class EmailForm extends Component<Prop, State> {
       body: "",
     },
     isLoading: false,
+    errorAlert: "",
   };
 
   handleChange = (e: React.FormEvent<HTMLInputElement>): void => {
@@ -45,10 +49,16 @@ export default class EmailForm extends Component<Prop, State> {
 
     let { email } = this.state;
 
-    this.props.onSubmit(email).then(() => {
-      this.resetObj(email);
-      this.setState({ email: email });
-    });
+    if (isEmpty(email.subject) || isEmpty(email.body)) {
+      this.setState({
+        errorAlert: "Please make sure to fill all the required fields !",
+      });
+    } else {
+      this.props.onSubmit(email).then(() => {
+        this.resetObj(email);
+        this.setState({ email: email });
+      });
+    }
   };
 
   resetObj(obj: any) {
@@ -59,7 +69,7 @@ export default class EmailForm extends Component<Prop, State> {
 
   render() {
     let { isModalOpened, closeModal, isSubmitting } = this.props;
-    let { email, isLoading } = this.state;
+    let { email, isLoading, errorAlert } = this.state;
 
     return (
       <Modal
@@ -122,6 +132,15 @@ export default class EmailForm extends Component<Prop, State> {
             </form>
           </>
         )}
+        <SweetAlert
+          show={!!errorAlert}
+          warning
+          title="An error occurred"
+          timeout={2000}
+          onConfirm={() => this.setState({ errorAlert: null })}
+        >
+          {errorAlert}
+        </SweetAlert>
       </Modal>
     );
   }

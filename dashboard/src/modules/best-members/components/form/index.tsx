@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
+import SweetAlert from "react-bootstrap-sweetalert";
 
 import { BestMember } from "configurations/interfaces/best-member.interface";
 import { Committee } from "configurations/interfaces/committee.interface";
@@ -9,6 +10,7 @@ import CommitteeService from "modules/committees/services/committee.service";
 import Loading from "shared/loading";
 import FormInput from "shared/Input";
 import ImageInput from "shared/image-input";
+import { isEmpty } from "shared/services/validation.service";
 
 interface Prop {
   isModalOpened: boolean;
@@ -23,6 +25,7 @@ interface State {
   isLoading: boolean;
   isImageUploading: boolean;
   committees: string[];
+  errorAlert: string;
 }
 
 export default class BestMemberForm extends Component<Prop, State> {
@@ -33,6 +36,7 @@ export default class BestMemberForm extends Component<Prop, State> {
       committee: "",
     },
     committees: [] as string[],
+    errorAlert: "",
     isLoading: false,
     isImageUploading: false,
   };
@@ -102,20 +106,20 @@ export default class BestMemberForm extends Component<Prop, State> {
 
     let { bestMember } = this.state;
 
-    this.setState(
-      {
-        bestMember: {
-          ...bestMember,
-          date: this.formatDate(),
-        } as any,
-      },
-      () => {
-        this.props.onSubmit(bestMember, true).then(() => {
-          this.resetObj(bestMember);
-          this.setState({ bestMember: bestMember });
-        });
-      }
-    );
+    if (
+      isEmpty(bestMember.committee) ||
+      isEmpty(bestMember.image) ||
+      isEmpty(bestMember.name)
+    ) {
+      this.setState({
+        errorAlert: "Please make sure to fill all the required fields !",
+      });
+    } else {
+      this.props.onSubmit(bestMember, true).then(() => {
+        this.resetObj(bestMember);
+        this.setState({ bestMember: bestMember });
+      });
+    }
   };
 
   resetObj(obj: any) {
@@ -187,6 +191,7 @@ export default class BestMemberForm extends Component<Prop, State> {
               <ImageInput
                 imgUrl={bestMember.image}
                 name="image"
+                required={true}
                 setImageUpload={this.setImageUpload}
               />
 

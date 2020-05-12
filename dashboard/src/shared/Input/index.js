@@ -263,7 +263,7 @@ export default class FormInput extends Component {
           </span>
         )}
 
-        {label && <label htmlFor={id}> {label} </label>}
+        {label && <label htmlFor={id}> {label} {this.isRequired() && <span className="error">*</span>} </label>}
 
         {type === "select" ? (
           <select onChange={this.validateField} {...this.getAcceptedProps()}>

@@ -2,12 +2,14 @@ import React, { Component } from "react";
 
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
+import SweetAlert from "react-bootstrap-sweetalert";
 
 import { Category } from "configurations/interfaces/category.interface";
 import CategoriesService from "modules/categories/services/categories.service";
 
 import Loading from "shared/loading";
 import FormInput from "shared/Input";
+import { isEmpty } from "shared/services/validation.service";
 
 interface Prop {
   isModalOpened: boolean;
@@ -20,6 +22,7 @@ interface Prop {
 interface State {
   category: Category;
   isLoading: boolean;
+  errorAlert: string;
 }
 
 export default class BestMemberForm extends Component<Prop, State> {
@@ -27,6 +30,7 @@ export default class BestMemberForm extends Component<Prop, State> {
     category: {
       name: "",
     },
+    errorAlert: "",
     isLoading: false,
   };
 
@@ -74,6 +78,12 @@ export default class BestMemberForm extends Component<Prop, State> {
 
     let { category } = this.state;
 
+    if (isEmpty(category.name)) {
+      this.setState({
+        errorAlert: "Please make sure to fill the name of the category !",
+      });
+    }
+
     this.props.onSubmit(category, true).then(() => {
       this.resetObj(category);
       this.setState({ category: category });
@@ -93,7 +103,7 @@ export default class BestMemberForm extends Component<Prop, State> {
       closeModal,
       isSubmitting,
     } = this.props;
-    let { category, isLoading } = this.state;
+    let { category, isLoading, errorAlert } = this.state;
 
     return (
       <Modal
@@ -144,6 +154,16 @@ export default class BestMemberForm extends Component<Prop, State> {
             </form>
           </>
         )}
+
+        <SweetAlert
+          show={!!errorAlert}
+          warning
+          title="An error occurred"
+          timeout={2000}
+          onConfirm={() => this.setState({ errorAlert: null })}
+        >
+          {errorAlert}
+        </SweetAlert>
       </Modal>
     );
   }
