@@ -79,7 +79,9 @@ class BlogService extends CoreService {
   }
 
   search(req, res) {
-    this.db.find({ title: { $regex: req.query.q } }).then((response) => {
+    let query = req.query.q;
+    let regexp = new RegExp(query, "i");
+    this.db.find({ title: { $regex: regexp } }).then((response) => {
       if (!response)
         return res.status(404).json({ msg: "No articles founded" });
 
