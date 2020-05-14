@@ -16,10 +16,7 @@ class SubscriberService extends CoreService {
     return title.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "-and-");
   }
 
-  sendBlogEmail(blog, origin) {
-    let blogLink = `${origin}/blog/${blog._id}/${this.titleSlugify(
-      blog.title
-    )}`;
+  sendBlogEmail(blog) {
     this.db
       .find({})
       .then((subscribers) => {
@@ -32,7 +29,6 @@ class SubscriberService extends CoreService {
               <div style="text-align: center;">
                 <h1> ${blog.title} </h1>
                 <p> ${blog.metaDescription} </p>
-                <a href="${blogLink}"> Read it now !</a>
               </div>
             `,
           };

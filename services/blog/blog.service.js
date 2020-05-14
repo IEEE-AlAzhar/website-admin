@@ -67,15 +67,21 @@ class BlogService extends CoreService {
         ...req.body,
       })
       .then((newRecord) => {
-        res.json(newRecord);
+        newRecord
+          .populate("categories")
+          .execPopulate()
+          .then((rec) => {
+            res.json(rec);
+          });
 
-        subscriberService.sendBlogEmail(newRecord, req.headers["origin"]);
+        subscriberService.sendBlogEmail(newRecord);
       })
-      .catch(() =>
+      .catch((err) => {
+        console.log(err);
         res.status(500).json({
           msg: "An error occurred, please try again later!",
-        })
-      );
+        });
+      });
   }
 
   search(req, res) {

@@ -3,7 +3,8 @@ import React, { Component } from "react";
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
 import Multiselect from "react-widgets/lib/Multiselect";
-import JoditEditor from "jodit-react";
+import SunEditor, { buttonList } from "suneditor-react";
+import "suneditor/dist/css/suneditor.min.css";
 import SweetAlert from "react-bootstrap-sweetalert";
 
 import { Article } from "configurations/interfaces/article.interface";
@@ -34,6 +35,7 @@ export default class ArticleForm extends Component<Prop, State> {
     article: {
       title: "",
       body: "",
+      lang: "",
       authorName: "",
       authorProfileLink: "",
       cover: "",
@@ -147,9 +149,6 @@ export default class ArticleForm extends Component<Prop, State> {
   }
 
   render() {
-    const config = {
-      readonly: false,
-    };
     let {
       isModalOpened,
       itemToBeEdited,
@@ -161,7 +160,7 @@ export default class ArticleForm extends Component<Prop, State> {
       isLoading,
       isImageUploading,
       categories,
-      errorAlert,
+      errorAlert
     } = this.state;
 
     return (
@@ -184,7 +183,7 @@ export default class ArticleForm extends Component<Prop, State> {
             <h3 className="mb-3"> Article </h3>
             <form onSubmit={this.handleSubmit}>
               <div className="row">
-                <div className="form-group col-md-6">
+                <div className="form-group col-md-4">
                   <FormInput
                     type="text"
                     required={true}
@@ -197,7 +196,7 @@ export default class ArticleForm extends Component<Prop, State> {
                     onChange={this.handleChange}
                   />
                 </div>
-                <div className="form-group col-md-6">
+                <div className="form-group col-md-4">
                   <label htmlFor="category">Categories</label>
                   <Multiselect
                     id="category"
@@ -207,7 +206,7 @@ export default class ArticleForm extends Component<Prop, State> {
                     value={article.categories}
                     allowCreate="onFilter"
                     onCreate={(name) => this.handleCreate(name)}
-                    onChange={(value) =>
+                    onChange={(value: any) =>
                       this.setState({
                         article: {
                           ...article,
@@ -215,6 +214,21 @@ export default class ArticleForm extends Component<Prop, State> {
                         },
                       })
                     }
+                  />
+                </div>
+                <div className="form-group col-md-4">
+                  <FormInput
+                    type="select"
+                    options={["Arabic", "English"]}
+                    required={true}
+                    placeholder="language of the article"
+                    label="Language"
+                    id="language"
+                    name="lang"
+                    errorPosition="bottom"
+                    className="form-control"
+                    value={article.lang}
+                    onChange={this.handleChange}
                   />
                 </div>
               </div>
@@ -239,7 +253,7 @@ export default class ArticleForm extends Component<Prop, State> {
                     {" "}
                     Body of the article <span className="error">*</span>{" "}
                   </label>
-                  <JoditEditor
+                  {/* <JoditEditor
                     value={article.body}
                     config={config}
                     onBlur={(newContent) => {
@@ -250,6 +264,20 @@ export default class ArticleForm extends Component<Prop, State> {
                         },
                       });
                     }}
+                  /> */}
+                  <SunEditor
+                    name="body"
+                    setContents={article.body}
+                    placeholder="Add the article body ..."
+                    onChange={(content: string) =>
+                      this.setState({
+                        article: {
+                          ...this.state.article,
+                          body: content,
+                        } as any,
+                      })
+                    }
+                    setOptions={{ buttonList: buttonList.complex }}
                   />
                 </div>
               </div>
@@ -286,6 +314,7 @@ export default class ArticleForm extends Component<Prop, State> {
               <ImageInput
                 imgUrl={article.cover}
                 required={true}
+                label="Blog Cover"
                 setImageUpload={this.setImageUpload}
               />
 

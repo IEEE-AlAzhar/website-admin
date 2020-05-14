@@ -11,6 +11,10 @@ const BlogSchema = new Schema(
       type: String,
       required: true,
     },
+    lang: {
+      type: String,
+      required: true,
+    },
     authorName: {
       type: String,
       required: true,

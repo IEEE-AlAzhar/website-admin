@@ -37,7 +37,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.9",
     "pm2": "^4.2.3",
-    "prettier": "^2.0.2"
+    "prettier": "^2.0.2",
+    "suneditor-react": "^2.11.0"
   },
   "husky": {
     "hooks": {
