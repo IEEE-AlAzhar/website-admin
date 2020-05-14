@@ -253,18 +253,6 @@ export default class ArticleForm extends Component<Prop, State> {
                     {" "}
                     Body of the article <span className="error">*</span>{" "}
                   </label>
-                  {/* <JoditEditor
-                    value={article.body}
-                    config={config}
-                    onBlur={(newContent) => {
-                      this.setState({
-                        article: {
-                          ...article,
-                          body: newContent,
-                        },
-                      });
-                    }}
-                  /> */}
                   <SunEditor
                     name="body"
                     setContents={article.body}

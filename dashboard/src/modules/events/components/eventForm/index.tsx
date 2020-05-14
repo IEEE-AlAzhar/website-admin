@@ -6,6 +6,8 @@ import JoditEditor from "jodit-react";
 import Moment from "moment";
 import momentLocalizer from "react-widgets-moment";
 import DateTimePicker from "react-widgets/lib/DateTimePicker";
+import SunEditor, { buttonList } from "suneditor-react";
+import "suneditor/dist/css/suneditor.min.css";
 import SweetAlert from "react-bootstrap-sweetalert";
 
 import { Event } from "configurations/interfaces/event.interface";
@@ -303,17 +305,19 @@ export default class EventForm extends Component<Prop, State> {
                   <label>
                     Event Description <span className="error">*</span>
                   </label>
-                  <JoditEditor
-                    value={event.description}
-                    config={config}
-                    onBlur={(newContent) => {
+                  <SunEditor
+                    name="body"
+                    setContents={event.description}
+                    placeholder="Add the article body ..."
+                    onChange={(content: string) =>
                       this.setState({
                         event: {
-                          ...event,
-                          description: newContent,
-                        },
-                      });
-                    }}
+                          ...this.state.event,
+                          description: content,
+                        } as any,
+                      })
+                    }
+                    setOptions={{ buttonList: buttonList.complex }}
                   />
                 </div>
               </div>
