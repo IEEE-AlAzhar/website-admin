@@ -32,10 +32,7 @@ interface State {
 
 export default class EventsListPage extends Component<Prop, State> {
   tableConfig = {
-    tableHeaders: [
-      "title",
-      "status"
-    ],
+    tableHeaders: ["title", "status"],
     className: "table-striped",
     actions: ["edit", "delete"],
   };
@@ -123,9 +120,11 @@ export default class EventsListPage extends Component<Prop, State> {
           });
         })
         .catch((err) => {
-          this.setState({
-            errorAlert: err.response.data.msg,
-          });
+          if (err.response) {
+            this.setState({
+              errorAlert: err.response.data.msg,
+            });
+          }
         });
     } else {
       this.setState({
@@ -141,7 +140,7 @@ export default class EventsListPage extends Component<Prop, State> {
       (item: Event) => item._id === event._id
     );
 
-    events.splice(objectToUpdateIndex, 1, Event as never);
+    events.splice(objectToUpdateIndex, 1, event as never);
 
     this.setState({ events });
   };
