@@ -182,8 +182,8 @@ export default class UserForm extends Component<Prop, State> {
                     required={true}
                     placeholder="Username"
                     label="Name"
-                    id="name"
-                    name="name"
+                    id="username"
+                    name="username"
                     errorPosition="bottom"
                     value={user.username}
                     onChange={this.handleChange}
