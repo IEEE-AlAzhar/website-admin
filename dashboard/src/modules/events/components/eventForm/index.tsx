@@ -2,7 +2,6 @@ import React, { Component } from "react";
 
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
-import JoditEditor from "jodit-react";
 import Moment from "moment";
 import momentLocalizer from "react-widgets-moment";
 import DateTimePicker from "react-widgets/lib/DateTimePicker";
@@ -131,10 +130,21 @@ export default class EventForm extends Component<Prop, State> {
         errorAlert: "Please make sure to fill all the required fields !",
       });
     } else {
-      this.props.onSubmit(event, true).then(() => {
-        this.resetObj(event);
-        this.setState({ event: event });
-      });
+      this.setState(
+        {
+          event: {
+            ...event,
+            startDate: event.startDate.toString(),
+            endDate: event.endDate.toString(),
+          } as any,
+        },
+        () => {
+          this.props.onSubmit(event, true).then(() => {
+            this.resetObj(event);
+            this.setState({ event: event });
+          });
+        }
+      );
     }
   };
 
@@ -151,9 +161,6 @@ export default class EventForm extends Component<Prop, State> {
   }
 
   render() {
-    const config = {
-      readonly: false,
-    };
     let {
       isModalOpened,
       itemToBeEdited,
@@ -245,15 +252,17 @@ export default class EventForm extends Component<Prop, State> {
                   </label>
                   <DateTimePicker
                     value={
-                      this.convertDateStringIntoDateObject(
-                        event.startDate
-                      ) as Date
+                      event.startDate
+                        ? (this.convertDateStringIntoDateObject(
+                            event.startDate
+                          ) as Date)
+                        : new Date()
                     }
                     onChange={(value) => {
                       this.setState({
                         event: {
                           ...event,
-                          startDate: value.toString(),
+                          startDate: value,
                         },
                       });
                     }}
@@ -265,20 +274,24 @@ export default class EventForm extends Component<Prop, State> {
                   </label>
                   <DateTimePicker
                     value={
-                      this.convertDateStringIntoDateObject(
-                        event.endDate
-                      ) as Date
+                      event.endDate
+                        ? (this.convertDateStringIntoDateObject(
+                            event.endDate
+                          ) as Date)
+                        : new Date()
                     }
                     min={
-                      this.convertDateStringIntoDateObject(
-                        event.startDate
-                      ) as Date
+                      event.startDate
+                        ? (this.convertDateStringIntoDateObject(
+                            event.startDate
+                          ) as Date)
+                        : new Date()
                     }
                     onChange={(value) => {
                       this.setState({
                         event: {
                           ...event,
-                          endDate: value.toString(),
+                          endDate: value,
                         },
                       });
                     }}

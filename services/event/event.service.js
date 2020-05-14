@@ -18,7 +18,7 @@ class EventService extends CoreService {
       .then((newRecord) => {
         res.json(newRecord);
 
-        subscriberService.sendEventEmail(newRecord);
+        // subscriberService.sendEventEmail(newRecord, res);
       })
       .catch(() =>
         res.status(500).json({

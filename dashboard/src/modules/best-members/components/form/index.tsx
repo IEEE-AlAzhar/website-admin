@@ -135,7 +135,13 @@ export default class BestMemberForm extends Component<Prop, State> {
       closeModal,
       isSubmitting,
     } = this.props;
-    let { bestMember, isLoading, isImageUploading, committees } = this.state;
+    let {
+      bestMember,
+      isLoading,
+      isImageUploading,
+      committees,
+      errorAlert,
+    } = this.state;
 
     return (
       <Modal
@@ -211,6 +217,15 @@ export default class BestMemberForm extends Component<Prop, State> {
             </form>
           </>
         )}
+        <SweetAlert
+          show={!!errorAlert}
+          warning
+          title="An error occurred"
+          timeout={2000}
+          onConfirm={() => this.setState({ errorAlert: null })}
+        >
+          {errorAlert}
+        </SweetAlert>
       </Modal>
     );
   }

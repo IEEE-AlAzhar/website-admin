@@ -45,7 +45,7 @@ class SubscriberService extends CoreService {
       });
   }
 
-  sendEventEmail(event) {
+  sendEventEmail(event, res) {
     this.db
       .find({})
       .then((subscribers) => {
