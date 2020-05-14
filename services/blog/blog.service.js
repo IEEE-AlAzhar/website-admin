@@ -92,6 +92,10 @@ class BlogService extends CoreService {
   filter(req, res) {
     let { categoryId } = req.params;
 
+    if (categoryId === "all") {
+      return this.listRecords(req, res);
+    }
+
     this.db.find({ categories: { $in: categoryId } }).then((response) => {
       if (!response)
         return res.status(404).json({ msg: "No articles founded" });
