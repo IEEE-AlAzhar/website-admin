@@ -20,6 +20,7 @@ class BlogService extends CoreService {
   listRecords(req, res) {
     this.db
       .find({})
+      .sort({ createdAt: -1 })
       .populate("categories")
       .then((records) => res.json(records))
       .catch(() =>
