@@ -31,6 +31,7 @@ export default class ImageInput extends Component<Prop, State> {
 
     setImageUpload(true);
     uploadImage(files && files[0]).then((res) => {
+      console.log(res)
       this.setState({
         isImageUploaded: true,
         // image: res.data.secure_url,

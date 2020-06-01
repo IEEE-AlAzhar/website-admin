@@ -10,6 +10,18 @@ class EventService extends CoreService {
     this.initialize(Event, "Event");
   }
 
+  listRecords(req, res) {
+    this.db
+      .find({})
+      .sort({ createdAt: -1 })
+      .then((records) => res.json(records))
+      .catch(() =>
+        res.status(500).json({
+          msg: "An error occurred, please try again later!",
+        })
+      );
+  }
+
   createRecord(req, res) {
     this.db
       .create({
@@ -18,7 +30,7 @@ class EventService extends CoreService {
       .then((newRecord) => {
         res.json(newRecord);
 
-        // subscriberService.sendEventEmail(newRecord, res);
+        subscriberService.sendEventEmail(newRecord, res);
       })
       .catch(() =>
         res.status(500).json({
