@@ -140,8 +140,8 @@ export default class EventForm extends Component<Prop, State> {
         },
         () => {
           this.props.onSubmit(event, true).then(() => {
-            this.resetObj(event);
             this.setState({ event: event });
+            this.resetObj(event);
           });
         }
       );
